@@ -2,12 +2,12 @@ package member
 
 import (
 	"context"
-	"github.com/suyuan32/simple-admin-common/utils/pointy"
 
 	"github.com/suyuan32/simple-admin-member-rpc/internal/svc"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
 	"github.com/suyuan32/simple-admin-member-rpc/types/mms"
 
+	"github.com/suyuan32/simple-admin-common/utils/pointy"
 	"github.com/suyuan32/simple-admin-common/utils/uuidx"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -44,6 +44,7 @@ func (l *GetMemberByIdLogic) GetMemberById(in *mms.UUIDReq) (*mms.MemberInfo, er
 		Mobile:    &result.Mobile,
 		Email:     &result.Email,
 		Avatar:    &result.Avatar,
-		ExpiredAt: pointy.GetPointer(result.ExpiredAt.UnixMilli()),
+		WechatId:  &result.WechatOpenID,
+		ExpiredAt: pointy.GetUnixMilliPointer(result.ExpiredAt.UnixMilli()),
 	}, nil
 }

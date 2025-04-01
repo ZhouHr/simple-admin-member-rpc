@@ -2,12 +2,12 @@ package memberrank
 
 import (
 	"context"
-	"github.com/suyuan32/simple-admin-common/utils/pointy"
 
 	"github.com/suyuan32/simple-admin-member-rpc/internal/svc"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
 	"github.com/suyuan32/simple-admin-member-rpc/types/mms"
 
+	"github.com/suyuan32/simple-admin-common/utils/pointy"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -32,7 +32,7 @@ func (l *GetMemberRankByIdLogic) GetMemberRankById(in *mms.IDReq) (*mms.MemberRa
 	}
 
 	return &mms.MemberRankInfo{
-		Id:          pointy.GetPointer(result.ID),
+		Id:          &result.ID,
 		CreatedAt:   pointy.GetPointer(result.CreatedAt.UnixMilli()),
 		UpdatedAt:   pointy.GetPointer(result.UpdatedAt.UnixMilli()),
 		Name:        &result.Name,

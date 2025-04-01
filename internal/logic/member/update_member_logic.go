@@ -2,14 +2,13 @@ package member
 
 import (
 	"context"
-	"github.com/suyuan32/simple-admin-common/utils/encrypt"
-	"github.com/suyuan32/simple-admin-common/utils/pointy"
 
 	"github.com/suyuan32/simple-admin-member-rpc/internal/svc"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
 	"github.com/suyuan32/simple-admin-member-rpc/types/mms"
 
 	"github.com/suyuan32/simple-admin-common/i18n"
+	"github.com/suyuan32/simple-admin-common/utils/pointy"
 	"github.com/suyuan32/simple-admin-common/utils/uuidx"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,8 +29,8 @@ func NewUpdateMemberLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Upda
 
 func (l *UpdateMemberLogic) UpdateMember(in *mms.MemberInfo) (*mms.BaseResp, error) {
 	query := l.svcCtx.DB.Member.UpdateOneID(uuidx.ParseUUIDString(*in.Id)).
-		SetNotNilStatus(pointy.GetStatusPointer(in.Status)).
 		SetNotNilUsername(in.Username).
+		SetNotNilPassword(in.Password).
 		SetNotNilNickname(in.Nickname).
 		SetNotNilRankID(in.RankId).
 		SetNotNilMobile(in.Mobile).
@@ -40,8 +39,8 @@ func (l *UpdateMemberLogic) UpdateMember(in *mms.MemberInfo) (*mms.BaseResp, err
 		SetNotNilWechatOpenID(in.WechatId).
 		SetNotNilExpiredAt(pointy.GetTimeMilliPointer(in.ExpiredAt))
 
-	if in.Password != nil && *in.Password != "" {
-		query.SetNotNilPassword(pointy.GetPointer(encrypt.BcryptEncrypt(*in.Password)))
+	if in.Status != nil {
+		query.SetNotNilStatus(pointy.GetPointer(uint8(*in.Status)))
 	}
 
 	err := query.Exec(l.ctx)

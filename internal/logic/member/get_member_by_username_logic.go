@@ -44,6 +44,7 @@ func (l *GetMemberByUsernameLogic) GetMemberByUsername(in *mms.UsernameReq) (*mm
 		RankCode:  &result.Edges.Ranks.Code,
 		Mobile:    &result.Mobile,
 		Email:     &result.Email,
+		WechatId:  &result.WechatOpenID,
 		Avatar:    &result.Avatar,
 		ExpiredAt: pointy.GetPointer(result.ExpiredAt.UnixMilli()),
 	}, nil

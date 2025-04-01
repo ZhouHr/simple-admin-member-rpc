@@ -14,7 +14,13 @@ type OauthProvider struct {
 }
 
 func (OauthProvider) Fields() []ent.Field {
+	incre := true
 	return []ent.Field{
+		field.Uint64("id").
+			Unique().
+			Immutable().
+			Positive().
+			Annotations(&entsql.Annotation{Incremental: &incre}),
 		field.String("name").Unique().
 			Comment("The provider's name | 提供商名称"),
 		field.String("client_id").

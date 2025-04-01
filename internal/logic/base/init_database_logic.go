@@ -2,7 +2,9 @@ package base
 
 import (
 	"context"
+	"github.com/suyuan32/simple-admin-common/utils/uuidx"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
+	"time"
 
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/suyuan32/simple-admin-common/enum/errorcode"
@@ -38,12 +40,12 @@ func (l *InitDatabaseLogic) InitDatabase(in *mms.Empty) (*mms.BaseResp, error) {
 		return nil, errorx.NewCodeError(errorcode.Internal, err.Error())
 	}
 
-	err := l.insertMemberData()
-	if err != nil {
-		return nil, err
-	}
+	//err := l.insertMemberData()
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	err = l.insertMemberRankData()
+	err := l.insertMemberRankData()
 	if err != nil {
 		return nil, err
 	}
@@ -62,20 +64,26 @@ func (l *InitDatabaseLogic) InitDatabase(in *mms.Empty) (*mms.BaseResp, error) {
 func (l *InitDatabaseLogic) insertMemberData() error {
 	var members []*ent.MemberCreate
 	members = append(members, l.svcCtx.DB.Member.Create().
+		SetID(uuidx.NewUUID()).
 		SetUsername("normalMember").
 		SetNickname("Normal Member").
 		SetEmail("simpleadmin@gmail.com").
 		SetMobile("18888888888").
 		SetRankID(1).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
 		SetPassword(encrypt.BcryptEncrypt("simple-admin")),
 	)
 
 	members = append(members, l.svcCtx.DB.Member.Create().
+		SetID(uuidx.NewUUID()).
 		SetUsername("VIPMember").
 		SetNickname("VIP Member").
 		SetEmail("vip@gmail.com").
 		SetMobile("18888888889").
 		SetRankID(2).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
 		SetPassword(encrypt.BcryptEncrypt("simple-admin")),
 	)
 
@@ -94,6 +102,8 @@ func (l *InitDatabaseLogic) insertMemberRankData() error {
 	memberRanks = append(memberRanks, l.svcCtx.DB.MemberRank.Create().
 		SetName("memberRank.normal").
 		SetCode("001").
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
 		SetDescription("普通会员 | Normal Member").
 		SetRemark("普通会员 | Normal Member"),
 	)
@@ -101,6 +111,8 @@ func (l *InitDatabaseLogic) insertMemberRankData() error {
 	memberRanks = append(memberRanks, l.svcCtx.DB.MemberRank.Create().
 		SetName("memberRank.vip").
 		SetCode("002").
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
 		SetDescription("VIP").
 		SetRemark("VIP"),
 	)
@@ -126,6 +138,8 @@ func (l *InitDatabaseLogic) insertProviderData() error {
 		SetAuthURL("https://accounts.google.com/o/oauth2/auth").
 		SetTokenURL("https://oauth2.googleapis.com/token").
 		SetAuthStyle(1).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
 		SetInfoURL("https://www.googleapis.com/oauth2/v2/userinfo?access_token=TOKEN"),
 	)
 
@@ -138,6 +152,8 @@ func (l *InitDatabaseLogic) insertProviderData() error {
 		SetAuthURL("https://github.com/login/oauth/authorize").
 		SetTokenURL("https://github.com/login/oauth/access_token").
 		SetAuthStyle(2).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
 		SetInfoURL("https://api.github.com/user"),
 	)
 

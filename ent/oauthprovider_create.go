@@ -188,6 +188,11 @@ func (opc *OauthProviderCreate) check() error {
 	if _, ok := opc.mutation.InfoURL(); !ok {
 		return &ValidationError{Name: "info_url", err: errors.New(`ent: missing required field "OauthProvider.info_url"`)}
 	}
+	if v, ok := opc.mutation.ID(); ok {
+		if err := oauthprovider.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "OauthProvider.id": %w`, err)}
+		}
+	}
 	return nil
 }
 

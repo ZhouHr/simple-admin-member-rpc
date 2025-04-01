@@ -37,7 +37,7 @@ func (Member) Fields() []ent.Field {
 			Optional().
 			Default("").
 			Comment("Avatar | 头像路径"),
-		field.String("wechat_open_id").Optional().
+		field.String("wechat_open_id").Optional().Unique().
 			Comment("Wechat Open ID | 微信 Open ID"),
 		field.Time("expired_at").Optional().
 			Comment("Member expired time | 会员到期时间").

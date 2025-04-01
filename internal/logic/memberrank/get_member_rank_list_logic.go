@@ -2,14 +2,13 @@ package memberrank
 
 import (
 	"context"
-	"github.com/suyuan32/simple-admin-common/utils/pointy"
-
 	"github.com/suyuan32/simple-admin-member-rpc/ent/memberrank"
 	"github.com/suyuan32/simple-admin-member-rpc/ent/predicate"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/svc"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
 	"github.com/suyuan32/simple-admin-member-rpc/types/mms"
 
+	"github.com/suyuan32/simple-admin-common/utils/pointy"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -29,16 +28,17 @@ func NewGetMemberRankListLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 func (l *GetMemberRankListLogic) GetMemberRankList(in *mms.MemberRankListReq) (*mms.MemberRankListResp, error) {
 	var predicates []predicate.MemberRank
+	//if in.CreatedAt != nil {
+	//	predicates = append(predicates, memberrank.CreatedAtGTE(time.UnixMilli(*in.CreatedAt)))
+	//}
+	//if in.UpdatedAt != nil {
+	//	predicates = append(predicates, memberrank.UpdatedAtGTE(time.UnixMilli(*in.UpdatedAt)))
+	//}
 	if in.Name != nil {
 		predicates = append(predicates, memberrank.NameContains(*in.Name))
 	}
-	if in.Description != nil {
-		predicates = append(predicates, memberrank.DescriptionContains(*in.Description))
-	}
-	if in.Remark != nil {
-		predicates = append(predicates, memberrank.RemarkContains(*in.Remark))
-	}
 	result, err := l.svcCtx.DB.MemberRank.Query().Where(predicates...).Page(l.ctx, in.Page, in.PageSize)
+
 	if err != nil {
 		return nil, dberrorhandler.DefaultEntError(l.Logger, err, in)
 	}
@@ -48,13 +48,13 @@ func (l *GetMemberRankListLogic) GetMemberRankList(in *mms.MemberRankListReq) (*
 
 	for _, v := range result.List {
 		resp.Data = append(resp.Data, &mms.MemberRankInfo{
-			Id:          pointy.GetPointer(v.ID),
+			Id:          &v.ID,
 			CreatedAt:   pointy.GetPointer(v.CreatedAt.UnixMilli()),
 			UpdatedAt:   pointy.GetPointer(v.UpdatedAt.UnixMilli()),
 			Name:        &v.Name,
+			Code:        &v.Code,
 			Description: &v.Description,
 			Remark:      &v.Remark,
-			Code:        &v.Code,
 		})
 	}
 

@@ -2,14 +2,12 @@ package member
 
 import (
 	"context"
-	"github.com/suyuan32/simple-admin-common/utils/pointy"
-
-	"github.com/suyuan32/simple-admin-member-rpc/ent/member"
 	"github.com/suyuan32/simple-admin-member-rpc/ent/predicate"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/svc"
 	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
 	"github.com/suyuan32/simple-admin-member-rpc/types/mms"
 
+	"github.com/suyuan32/simple-admin-common/utils/pointy"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -29,25 +27,15 @@ func NewGetMemberListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Get
 
 func (l *GetMemberListLogic) GetMemberList(in *mms.MemberListReq) (*mms.MemberListResp, error) {
 	var predicates []predicate.Member
-	if in.Username != nil {
-		predicates = append(predicates, member.UsernameContains(*in.Username))
-	}
-	if in.Nickname != nil {
-		predicates = append(predicates, member.NicknameContains(*in.Nickname))
-	}
-	if in.Mobile != nil {
-		predicates = append(predicates, member.MobileContains(*in.Mobile))
-	}
-	if in.Email != nil {
-		predicates = append(predicates, member.EmailContains(*in.Email))
-	}
-	if in.RankId != nil && *in.RankId != 0 {
-		predicates = append(predicates, member.RankIDEQ(*in.RankId))
-	}
-	if in.WechatId != nil {
-		predicates = append(predicates, member.WechatOpenIDEQ(*in.WechatId))
-	}
-
+	//if in.CreatedAt != nil {
+	//	predicates = append(predicates, member.CreatedAtGTE(time.UnixMilli(*in.CreatedAt)))
+	//}
+	//if in.UpdatedAt != nil {
+	//	predicates = append(predicates, member.UpdatedAtGTE(time.UnixMilli(*in.UpdatedAt)))
+	//}
+	//if in.Status != nil {
+	//	predicates = append(predicates, member.StatusEQ(uint8(*in.Status)))
+	//}
 	result, err := l.svcCtx.DB.Member.Query().Where(predicates...).Page(l.ctx, in.Page, in.PageSize)
 
 	if err != nil {
@@ -70,7 +58,8 @@ func (l *GetMemberListLogic) GetMemberList(in *mms.MemberListReq) (*mms.MemberLi
 			Mobile:    &v.Mobile,
 			Email:     &v.Email,
 			Avatar:    &v.Avatar,
-			ExpiredAt: pointy.GetPointer(v.ExpiredAt.UnixMilli()),
+			WechatId:  &v.WechatOpenID,
+			ExpiredAt: pointy.GetUnixMilliPointer(v.ExpiredAt.UnixMilli()),
 		})
 	}
 

@@ -2,19 +2,14 @@ package token
 
 import (
 	"context"
-	"github.com/suyuan32/simple-admin-common/config"
-	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
-	"github.com/suyuan32/simple-admin-member-rpc/types/mms"
-	"time"
-
-	"github.com/suyuan32/simple-admin-common/enum/common"
-	"github.com/suyuan32/simple-admin-common/i18n"
-	"github.com/suyuan32/simple-admin-common/msg/logmsg"
-	"github.com/suyuan32/simple-admin-common/utils/pointy"
-	"github.com/suyuan32/simple-admin-common/utils/uuidx"
-	"github.com/zeromicro/go-zero/core/errorx"
 
 	"github.com/suyuan32/simple-admin-member-rpc/internal/svc"
+	"github.com/suyuan32/simple-admin-member-rpc/internal/utils/dberrorhandler"
+	"github.com/suyuan32/simple-admin-member-rpc/types/mms"
+
+	"github.com/suyuan32/simple-admin-common/i18n"
+	"github.com/suyuan32/simple-admin-common/utils/pointy"
+	"github.com/suyuan32/simple-admin-common/utils/uuidx"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -33,29 +28,21 @@ func NewUpdateTokenLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Updat
 }
 
 func (l *UpdateTokenLogic) UpdateToken(in *mms.TokenInfo) (*mms.BaseResp, error) {
-	token, err := l.svcCtx.DB.Token.UpdateOneID(uuidx.ParseUUIDString(*in.Id)).
-		SetNotNilStatus(pointy.GetStatusPointer(in.Status)).
+	query := l.svcCtx.DB.Token.UpdateOneID(uuidx.ParseUUIDString(*in.Id)).
+		SetNotNilUUID(uuidx.ParseUUIDStringToPointer(in.Uuid)).
+		SetNotNilToken(in.Token).
+		SetNotNilUsername(in.Username).
 		SetNotNilSource(in.Source).
-		Save(l.ctx)
-	if err != nil {
-		return nil, dberrorhandler.DefaultEntError(l.Logger, err, in)
+		SetNotNilExpiredAt(pointy.GetTimeMilliPointer(in.ExpiredAt))
+
+	if in.Status != nil {
+		query.SetNotNilStatus(pointy.GetPointer(uint8(*in.Status)))
 	}
 
-	if uint8(*in.Status) == common.StatusBanned {
-		expiredTime := token.ExpiredAt.Sub(time.Now())
-		if expiredTime > 0 {
-			err = l.svcCtx.Redis.Set(l.ctx, config.RedisTokenPrefix+token.Token, "1", expiredTime).Err()
-			if err != nil {
-				logx.Errorw(logmsg.RedisError, logx.Field("detail", err.Error()))
-				return nil, errorx.NewInternalError(i18n.RedisError)
-			}
-		}
-	} else if uint8(*in.Status) == common.StatusNormal {
-		err := l.svcCtx.Redis.Del(l.ctx, config.RedisTokenPrefix+token.Token).Err()
-		if err != nil {
-			logx.Errorw(logmsg.RedisError, logx.Field("detail", err.Error()))
-			return nil, errorx.NewInternalError(i18n.RedisError)
-		}
+	err := query.Exec(l.ctx)
+
+	if err != nil {
+		return nil, dberrorhandler.DefaultEntError(l.Logger, err, in)
 	}
 
 	return &mms.BaseResp{Msg: i18n.UpdateSuccess}, nil
