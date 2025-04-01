@@ -31,7 +31,7 @@ jobs: # 定义工作流中的作业（一系列步骤）
 
       - name: Archive build artifact
         run: |
-          tar -zcvf  api.tar.gz ./mms_api
+          tar -zcvf  rpc.tar.gz ./mms_rpc
           pwd
           ls -l
 
@@ -46,7 +46,7 @@ jobs: # 定义工作流中的作业（一系列步骤）
           host: ${{ secrets.SERVER_HOST }} # 服务器的 IP 地址或域名，从 GitHub Secrets 中获取
           username: ${{ secrets.SERVER_USER }} # 服务器的用户名，从 GitHub Secrets 中获取
           password: ${{ secrets.SERVER_KEY }} # 服务器的 SSH 私钥，从 GitHub Secrets 中获取
-          source: api.tar.gz
+          source: rpc.tar.gz
           target: /data/servers/truck_server/member/ # 替换为服务器上的目标路径
 
   deploy: # 定义一个名为 "deploy" 的作业，用于部署
@@ -65,7 +65,7 @@ jobs: # 定义工作流中的作业（一系列步骤）
           script: | # 在服务器上执行的脚本
             cd /data/servers/truck_server/member/
             ls -l ./
-            tar -zxvf api.tar.gz
-            mv ./mms_api ./bin/api && ./service api restart # 替换为你的服务名称，重启服务
-            rm -rf ./api.tar.gz
+            tar -zxvf rpc.tar.gz
+            mv -f ./mms_rpc ./bin/rpc && ./service rpc restart # 替换为你的服务名称，重启服务
+            rm -rf ./rpc.tar.gz
             ls -l ./
